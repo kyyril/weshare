@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import ScreenWrapper from "../components/ScreenWrapper";
 import { StatusBar } from "expo-status-bar";
@@ -21,8 +21,7 @@ const welcome = () => {
         <View style={{ gap: 20 }}>
           <Text style={styles.title}>WeShare!</Text>
           <Text style={styles.puncline}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui,
-            labore?
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui, labore
           </Text>
         </View>
 
@@ -33,6 +32,23 @@ const welcome = () => {
             buttonStyle={{ marginHorizontal: wp(3) }}
             onPress={() => {}}
           />
+
+          <View style={styles.bottomTextContainer}>
+            <Text style={styles.loginText}>Already heve an account?</Text>
+            <Pressable>
+              <Text
+                style={[
+                  styles.loginText,
+                  {
+                    color: theme.colors.primaryDark,
+                    fontWeight: theme.fonts.semibold,
+                  },
+                ]}
+              >
+                Login
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     </ScreenWrapper>
@@ -69,5 +85,16 @@ const styles = StyleSheet.create({
   footer: {
     width: "100%",
     gap: 30,
+  },
+  bottomTextContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 5,
+  },
+  loginText: {
+    textAlign: "center",
+    color: theme.colors.text,
+    fontSize: hp(1.6),
   },
 });
