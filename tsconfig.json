@@ -12,6 +12,6 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "app/index.jsx",
-    "app/context/authContext.jsx"
+    "context/authContext.jsx"
   ]
 }
