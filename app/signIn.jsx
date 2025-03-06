@@ -17,6 +17,7 @@ import { useRouter } from "expo-router";
 import { useRef } from "react";
 import Lock from "../assets/icons/Lock";
 import Button from "../components/Button";
+import { supabase } from "../lib/supabase";
 
 const SignIn = () => {
   const router = useRouter();
@@ -28,6 +29,21 @@ const SignIn = () => {
     if (!emailRef.current || !passRef.current) {
       Alert.alert("SignIn", "Please fill all the fields");
       return;
+    }
+
+    let email = emailRef.current.trim();
+    let password = passRef.current.trim();
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setLoading(false);
+    console.log("error", error);
+    if (error) {
+      Alert.alert("SignIn", error.message);
     }
   };
 

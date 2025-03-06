@@ -18,6 +18,7 @@ import { useRef } from "react";
 import Lock from "../assets/icons/Lock";
 import Button from "../components/Button";
 import User from "../assets/icons/User";
+import { supabase } from "../lib/supabase";
 
 const SignUp = () => {
   const router = useRouter();
@@ -30,6 +31,29 @@ const SignUp = () => {
     if (!emailRef.current || !passRef.current || !userNameRef.current) {
       Alert.alert("SignUp", "Please fill all the fields");
       return;
+    }
+    let name = userNameRef.current.trim();
+    let email = emailRef.current.trim();
+    let password = passRef.current.trim();
+    setLoading(true);
+
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+        },
+      },
+    });
+    setLoading(false);
+    console.log("session", session);
+    console.log("error", error);
+    if (error) {
+      Alert.alert("SignUp", error.message);
     }
   };
 
