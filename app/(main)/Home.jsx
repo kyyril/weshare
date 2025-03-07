@@ -14,22 +14,13 @@ import Avatar from "../../components/Avatar";
 const Home = () => {
   const { setAuth, user } = useAuth();
   const router = useRouter();
-  const onLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      Alert.alert("SignOut", error.message);
-    } else {
-      setAuth(null);
-    }
-  };
 
   return (
-    <ScreenWrapper bg={"white"}>
+    <ScreenWrapper bg={"black"}>
       <View style={styles.container}>
         {/* header */}
         <View style={styles.header}>
           <Text style={styles.title}>WeShare</Text>
-
           <View style={styles.icons}>
             <Pressable onPress={() => router.push("notifications")}>
               <Heart color={theme.colors.text} />
@@ -48,7 +39,6 @@ const Home = () => {
           </View>
         </View>
       </View>
-      <Button title="SignOut" onPress={onLogout} />
     </ScreenWrapper>
   );
 };

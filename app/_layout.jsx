@@ -20,8 +20,8 @@ const MainLayout = () => {
     supabase.auth.onAuthStateChange((_event, session) => {
       if (session && session?.user) {
         setAuth(session?.user);
-        updateUserData(session?.user);
-        router.replace("home");
+        updateUserData(session?.user, session.user.email);
+        router.replace("Home");
       } else {
         setAuth(null);
         router.replace("/welcome");
@@ -29,10 +29,10 @@ const MainLayout = () => {
     });
   }, []);
 
-  const updateUserData = async (user) => {
+  const updateUserData = async (user, email) => {
     let res = await getUserData(user?.id);
     if (res.success) {
-      setUserData(res.data);
+      setUserData({ ...res.data, email });
     }
   };
 
