@@ -67,8 +67,8 @@ const UserHeader = ({ user, router, handleLogout }) => {
 
       <View style={styles.container}>
         {/* avatar */}
-        <View style={{ gap: 15 }}>
-          <View style={styles.avatarContainer}>
+        <View style={[styles.contentContainer, { gap: 10 }]}>
+          <View style={styles.avatarWrapper}>
             <Avatar
               url={user?.image}
               size={hp(12)}
@@ -84,7 +84,9 @@ const UserHeader = ({ user, router, handleLogout }) => {
 
           {/* user info */}
           <View style={{ alignItems: "center", gap: 4 }}>
-            <Text style={styles.userName}>{user?.name}</Text>
+            <Text style={styles.userName}>
+              {(user && user.name) || "username"}
+            </Text>
             <Text style={styles.infoText}>medan</Text>
           </View>
           <View style={{ gap: 10 }}>
@@ -113,10 +115,18 @@ const UserHeader = ({ user, router, handleLogout }) => {
 export default Profile;
 
 const styles = StyleSheet.create({
+  contentContainer: {
+    alignItems: "center",
+    gap: 15,
+  },
   noPost: {
     fontSize: hp(2),
     textAlign: "center",
     color: theme.colors.text,
+  },
+  avatarWrapper: {
+    position: "relative",
+    alignItems: "center",
   },
   listStyle: {
     paddingHorizontal: wp(4),
@@ -147,6 +157,7 @@ const styles = StyleSheet.create({
   editIcon: {
     position: "absolute",
     right: -12,
+    bottom: -4,
     padding: 7,
     borderRadius: theme.radius.md,
     backgroundColor: "white",
