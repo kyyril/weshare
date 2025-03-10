@@ -20,9 +20,13 @@ import Location from "../../assets/icons/Location";
 import Call from "../../assets/icons/Call";
 import Button from "../../components/Button";
 import { updateUser } from "../../services/userServices";
-
+import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import { getUserImage, uploadImageFile } from "../../services/userImage";
+import { Image } from "expo-image";
 const EditProfile = () => {
-  const { user: currentUser } = useAuth();
+  const router = useRouter();
+  const { user: currentUser, setUserData } = useAuth();
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({
     name: "",
@@ -44,10 +48,6 @@ const EditProfile = () => {
     }
   }, [currentUser]);
 
-  const onPickImage = async () => {
-    //
-  };
-
   const onSubmit = async () => {
     let userData = { ...user };
     let { name, bio, address, phoneNumber, image } = userData;
@@ -56,16 +56,38 @@ const EditProfile = () => {
       return;
     }
     setLoading(true);
+
+    if (typeof image == "object") {
+      // upload image
+      let imageRes = await uploadImageFile("profile", image.uri, true);
+      if (imageRes.success) userData.image = imageRes.data;
+      else userData.image = null;
+    }
     //update user
     const res = await updateUser(currentUser.id, userData);
     setLoading(false);
-    console.log("res", res);
     if (res.success) {
-      Alert.alert("Edit Profile", "Profile updated successfully");
-    } else {
-      Alert.alert("Edit Profile", res.message);
+      setUserData({ ...currentUser, ...userData });
+      router.back();
     }
   };
+
+  const onPickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.7,
+    });
+    if (!result.canceled) {
+      setUser({ ...user, image: result.assets[0] });
+    }
+  };
+
+  let imageSource =
+    user.image && typeof user.image === "object"
+      ? { uri: user.image.uri }
+      : getUserImage(user.image);
 
   return (
     <ScreenWrapper>
@@ -76,8 +98,7 @@ const EditProfile = () => {
           {/* form */}
           <View style={styles.avatarWrapper}>
             <Avatar
-              style={styles.avatar}
-              url={user?.image}
+              source={imageSource}
               size={hp(16)}
               rounded={theme.radius.xxl * 4}
             />

@@ -87,7 +87,10 @@ const UserHeader = ({ user, router, handleLogout }) => {
             <Text style={styles.userName}>
               {(user && user.name) || "username"}
             </Text>
-            <Text style={styles.infoText}>medan</Text>
+            <Text style={styles.infoText}>
+              {" "}
+              {(user && user.address) || "yunani"}
+            </Text>
           </View>
           <View style={{ gap: 10 }}>
             <View style={styles.info}>

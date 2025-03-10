@@ -11,7 +11,10 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "app/index.jsx",
-    "context/authContext.jsx"
+    "app/index.tsx",
+    "context/authContext.tsx",
+    "components/Avatar.jsx",
+    "components/BackButton.jsx",
+    "components/Button.jsx"
   ]
 }
