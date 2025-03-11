@@ -12,7 +12,6 @@ const RichTextEditor = ({ editorRef, onChange }) => {
     <View style={{ minHeight: 285 }}>
       <RichToolbar
         actions={[
-          actions.insertImage,
           actions.setBold,
           actions.setItalic,
           actions.insertBulletsList,
@@ -22,7 +21,6 @@ const RichTextEditor = ({ editorRef, onChange }) => {
           actions.setStrikethrough,
           actions.setUnderline,
           actions.removeFormat,
-          actions.insertVideo,
           actions.checkboxList,
           actions.undo,
           actions.redo,
