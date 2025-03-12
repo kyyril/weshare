@@ -1,8 +1,15 @@
-import React from "react";
-import { Alert, Button, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  Button,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { useAuth } from "../../context/authContext";
-import { supabase } from "../../lib/supabase";
 import { theme } from "../../constants/theme";
 import { hp, wp } from "../../helpers/common";
 import Heart from "../../assets/icons/Heart";
@@ -10,10 +17,28 @@ import Plus from "../../assets/icons/Plus";
 import User from "../../assets/icons/User";
 import { useRouter } from "expo-router";
 import Avatar from "../../components/Avatar";
+import { fetchPosts } from "../../services/postService";
+import PostCard from "../../components/PostCard";
 
 const Home = () => {
   const { setAuth, user } = useAuth();
   const router = useRouter();
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    getPosts();
+  }, []);
+
+  var limit = 0;
+  const getPosts = async () => {
+    limit = limit + 10;
+    //getpost
+    console.log("fetch limit:", limit);
+    const res = await fetchPosts(limit);
+    if (res.success) {
+      setPosts(res.data);
+    }
+  };
 
   return (
     <ScreenWrapper bg={"black"}>
@@ -38,6 +63,19 @@ const Home = () => {
             </Pressable>
           </View>
         </View>
+
+        {/* posts */}
+        <FlatList
+          data={posts}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listStyle}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <PostCard item={item} currentUser={user} router={router} />
+          )}
+          onEndReached={getPosts}
+          onEndReachedThreshold={0.5}
+        />
       </View>
     </ScreenWrapper>
   );

@@ -7,7 +7,7 @@ import { getUserImage } from "../services/userImage";
 
 const Avatar = ({
   url,
-  size = hp(4.5),
+  size = hp(5.5),
   rounded = theme.radius.md,
   style = {},
 }) => {

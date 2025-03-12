@@ -9,7 +9,7 @@ export const getUserImage = (imagePath) => {
   return require("../assets/images/defaultUser.png");
 };
 
-const getSupabaseUrl = (filePath) => {
+export const getSupabaseUrl = (filePath) => {
   if (filePath) {
     return `${supabaseUrl}/storage/v1/object/public/uploads/${filePath}`;
   }
