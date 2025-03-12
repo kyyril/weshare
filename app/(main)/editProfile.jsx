@@ -13,7 +13,6 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import Header from "../../components/Header";
 import { useAuth } from "../../context/authContext";
 import Camera from "../../assets/icons/Camera";
-import Avatar from "../../components/Avatar";
 import Input from "../../components/input";
 import User from "../../assets/icons/User";
 import Location from "../../assets/icons/Location";
@@ -24,6 +23,7 @@ import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { getUserImage, uploadFile } from "../../services/userImage";
 import { Image } from "expo-image";
+
 const EditProfile = () => {
   const router = useRouter();
   const { user: currentUser, setUserData } = useAuth();
@@ -74,9 +74,9 @@ const EditProfile = () => {
 
   const onPickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [1, 1],
       quality: 0.7,
     });
     if (!result.canceled) {
@@ -84,10 +84,15 @@ const EditProfile = () => {
     }
   };
 
-  let imageSource =
-    user.image && typeof user.image === "object"
-      ? { uri: user.image.uri }
-      : getUserImage(user.image);
+  const getImageSource = () => {
+    if (!user.image) {
+      return require("../../assets/images/defaultUser.png");
+    }
+    if (typeof user.image === "object") {
+      return { uri: user.image.uri };
+    }
+    return { uri: getUserImage(user.image) };
+  };
 
   return (
     <ScreenWrapper>
@@ -95,15 +100,14 @@ const EditProfile = () => {
         <ScrollView style={{ flex: 1 }}>
           <Header title={"Edit Profile"} showBackButton />
 
-          {/* form */}
           <View style={styles.avatarWrapper}>
-            <Avatar
-              source={imageSource}
-              size={hp(16)}
-              rounded={theme.radius.xxl * 4}
+            <Image
+              source={getImageSource()}
+              style={styles.avatarImage}
+              contentFit="cover"
             />
             <Pressable style={styles.cameraIcon} onPress={onPickImage}>
-              <Camera />
+              <Camera color={theme.colors.primary} />
             </Pressable>
           </View>
 
@@ -193,22 +197,28 @@ const styles = StyleSheet.create({
   },
   cameraIcon: {
     position: "absolute",
-    right: -25,
-    bottom: -30,
-    padding: 7,
-    borderRadius: theme.radius.md,
+    right: -10,
+    bottom: -10,
+    padding: 10,
+    borderRadius: theme.radius.xl,
     backgroundColor: "white",
     shadowColor: theme.colors.textLight,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 7,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   avatarWrapper: {
-    marginBottom: 50,
+    marginVertical: hp(3),
     alignItems: "center",
-    height: hp(12),
-    width: wp(12),
+    position: "relative",
     alignSelf: "center",
+  },
+  avatarImage: {
+    width: hp(16),
+    height: hp(16),
+    borderRadius: theme.radius.xxl * 4,
+    borderWidth: 2,
+    borderColor: theme.colors.primary + "20",
   },
 });
