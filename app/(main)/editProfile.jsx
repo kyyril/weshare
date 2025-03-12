@@ -22,7 +22,7 @@ import Button from "../../components/Button";
 import { updateUser } from "../../services/userServices";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import { getUserImage, uploadImageFile } from "../../services/userImage";
+import { getUserImage, uploadFile } from "../../services/userImage";
 import { Image } from "expo-image";
 const EditProfile = () => {
   const router = useRouter();
@@ -59,7 +59,7 @@ const EditProfile = () => {
 
     if (typeof image == "object") {
       // upload image
-      let imageRes = await uploadImageFile("profile", image.uri, true);
+      let imageRes = await uploadFile("profile", image.uri, true);
       if (imageRes.success) userData.image = imageRes.data;
       else userData.image = null;
     }

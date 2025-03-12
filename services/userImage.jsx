@@ -16,7 +16,7 @@ const getSupabaseUrl = (filePath) => {
   return null;
 };
 
-export const uploadImageFile = async (folderName, fileUri, isImage = true) => {
+export const uploadFile = async (folderName, fileUri, isImage = true) => {
   try {
     let fileName = getFilePath(folderName, isImage);
     const fileBase64 = await FileSystem.readAsStringAsync(fileUri, {
