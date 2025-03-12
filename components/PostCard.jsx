@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { theme } from "../constants/theme";
 import { hp, wp } from "../helpers/common";
 import Avatar from "./Avatar";
@@ -10,6 +10,9 @@ import RenderHTML from "react-native-render-html";
 import { Image } from "expo-image";
 import { getSupabaseUrl } from "../services/userImage";
 import { Video } from "expo-av";
+import Heart from "../assets/icons/Heart";
+import Comment from "../assets/icons/Comment";
+import Share from "../assets/icons/Share";
 
 const textStyles = {
   color: theme.colors.dark,
@@ -28,12 +31,18 @@ const tagsStyles = {
 };
 
 const PostCard = ({ item, currentUser, router }) => {
-  const createdAt = moment(item.created_at).format("MMM D");
-  console.log(item);
-
+  const [liked, setLiked] = useState(true);
   const openPostDetail = () => {
     //open
   };
+  const createdAt = moment(item.created_at).format("MMM D");
+
+  const onLikeCliked = () => {
+    setLiked(!liked);
+  };
+
+  let likes = [];
+  let comments = [];
   return (
     <View style={[styles.container]}>
       <View style={styles.header}>
@@ -86,6 +95,34 @@ const PostCard = ({ item, currentUser, router }) => {
           onError={(error) => console.log("Video Error:", error)}
         />
       )}
+
+      {/* liked and comment */}
+      <View style={styles.footer}>
+        <View style={styles.footerButton}>
+          <TouchableOpacity onPress={onLikeCliked}>
+            <Heart
+              fill={liked ? theme.colors.rose : "transparent"}
+              style={{
+                color: liked ? theme.colors.rose : "black",
+              }}
+            />
+          </TouchableOpacity>
+          <Text style={styles.count}>{likes.length}</Text>
+        </View>
+
+        <View style={styles.footerButton}>
+          <TouchableOpacity>
+            <Comment />
+          </TouchableOpacity>
+          <Text style={styles.count}>{comments.length}</Text>
+        </View>
+
+        <View style={styles.footerButton}>
+          <TouchableOpacity>
+            <Share />
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 };

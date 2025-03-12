@@ -19,14 +19,38 @@ import { useRouter } from "expo-router";
 import Avatar from "../../components/Avatar";
 import { fetchPosts } from "../../services/postService";
 import PostCard from "../../components/PostCard";
+import Loading from "../../components/Loading";
+import { supabase } from "../../lib/supabase";
+import { getUserData } from "../../services/userServices";
 
 const Home = () => {
   const { setAuth, user } = useAuth();
   const router = useRouter();
   const [posts, setPosts] = useState([]);
 
+  const handlePostEvent = async (payload) => {
+    if (payload.eventType == "INSERT" && payload?.new?.id) {
+      let newPost = { ...payload.new };
+      let res = await getUserData(newPost.userId);
+      newPost.user = res.success ? res.data : {};
+      setPosts((prevPost) => [newPost, ...prevPost]);
+    }
+  };
   useEffect(() => {
+    let postChannel = supabase
+      .channel("posts")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "posts" },
+        handlePostEvent
+      )
+      .subscribe();
+
     getPosts();
+
+    return () => {
+      supabase.removeChannel(postChannel);
+    };
   }, []);
 
   var limit = 0;
@@ -41,7 +65,7 @@ const Home = () => {
   };
 
   return (
-    <ScreenWrapper bg={"black"}>
+    <ScreenWrapper bg={"white"}>
       <View style={styles.container}>
         {/* header */}
         <View style={styles.header}>
@@ -75,6 +99,11 @@ const Home = () => {
           )}
           onEndReached={getPosts}
           onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            <View style={{ marginVertical: posts.length == 0 ? 200 : 30 }}>
+              <Loading />
+            </View>
+          }
         />
       </View>
     </ScreenWrapper>
