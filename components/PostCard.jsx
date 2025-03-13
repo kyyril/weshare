@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { theme } from "../constants/theme";
 import { hp, wp } from "../helpers/common";
 import Avatar from "./Avatar";
@@ -13,6 +13,8 @@ import { Video } from "expo-av";
 import Heart from "../assets/icons/Heart";
 import Comment from "../assets/icons/Comment";
 import Share from "../assets/icons/Share";
+import { createPostLike, removePostLike } from "../services/postService";
+import { Alert } from "react-native";
 
 const textStyles = {
   color: theme.colors.dark,
@@ -31,18 +33,49 @@ const tagsStyles = {
 };
 
 const PostCard = ({ item, currentUser, router }) => {
-  const [liked, setLiked] = useState(true);
+  const [likes, setLikes] = useState([]);
   const openPostDetail = () => {
     //open
   };
   const createdAt = moment(item.created_at).format("MMM D");
 
-  const onLikeCliked = () => {
-    setLiked(!liked);
+  useEffect(() => {
+    setLikes(item.postLike);
+  }, []);
+
+  const onLiked = async () => {
+    if (liked) {
+      //remove like
+      let updatedLikes = likes.filter((like) => like.userId != currentUser?.id);
+      setLikes([...updatedLikes]);
+
+      let res = await removePostLike(item?.id, currentUser?.id);
+      console.log("remove like:", res);
+      if (!res.success) {
+        Alert.alert("Post", "Something went wrong!");
+      }
+    } else {
+      //create like
+      let data = {
+        userId: currentUser?.id,
+        postId: item?.id,
+      };
+
+      setLikes([...likes, data]);
+
+      let res = await createPostLike(data);
+      console.log("add like:", res);
+      if (!res.success) {
+        Alert.alert("Post", "Something went wrong!");
+      }
+    }
   };
 
-  let likes = [];
+  let liked = likes.filter((like) => like.userId == currentUser?.id)[0]
+    ? true
+    : false;
   let comments = [];
+
   return (
     <View style={[styles.container]}>
       <View style={styles.header}>
@@ -99,7 +132,7 @@ const PostCard = ({ item, currentUser, router }) => {
       {/* liked and comment */}
       <View style={styles.footer}>
         <View style={styles.footerButton}>
-          <TouchableOpacity onPress={onLikeCliked}>
+          <TouchableOpacity onPress={onLiked}>
             <Heart
               fill={liked ? theme.colors.rose : "transparent"}
               style={{
