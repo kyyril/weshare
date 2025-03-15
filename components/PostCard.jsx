@@ -33,7 +33,7 @@ const tagsStyles = {
   },
 };
 
-const PostCard = ({ item, currentUser, router }) => {
+const PostCard = ({ item, currentUser, router, showMore = true }) => {
   const [likes, setLikes] = useState([]); // Initialize with empty array
   const [loading, setLoading] = useState(false);
 
@@ -87,6 +87,8 @@ const PostCard = ({ item, currentUser, router }) => {
   }, [likes, currentUser?.id]);
 
   const openPostDetail = () => {
+    if (!showMore) return null;
+
     //openPostComment
     router.push({ pathname: "postDetail", params: { postId: item?.id } });
   };
@@ -115,7 +117,7 @@ const PostCard = ({ item, currentUser, router }) => {
     }
   };
 
-  let comments = [];
+  console.log(item.comments[0].count);
   return (
     <View style={[styles.container]}>
       <View style={styles.header}>
@@ -126,9 +128,11 @@ const PostCard = ({ item, currentUser, router }) => {
             <Text style={styles.postTime}>{createdAt}</Text>
           </View>
         </View>
-        <TouchableOpacity onPress={openPostDetail}>
-          <ThreeDotsHorizontal />
-        </TouchableOpacity>
+        {showMore && (
+          <TouchableOpacity onPress={openPostDetail}>
+            <ThreeDotsHorizontal />
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* body post */}
@@ -187,7 +191,7 @@ const PostCard = ({ item, currentUser, router }) => {
           <TouchableOpacity onPress={openPostDetail}>
             <Comment />
           </TouchableOpacity>
-          <Text style={styles.count}>{comments.length}</Text>
+          <Text style={styles.count}>{item.comments[0].count}</Text>
         </View>
 
         <View style={styles.footerButton}>

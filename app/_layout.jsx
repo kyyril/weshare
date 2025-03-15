@@ -42,7 +42,21 @@ const MainLayout = () => {
     }
   };
 
-  return <Stack screenOptions={{ headerShow: false }} />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen
+        name="(main)/postDetail"
+        options={{
+          presentation: "modal",
+          headerShown: false,
+          animation: "slide_from_bottom",
+          headerStyle: {
+            backgroundColor: "#ffffff",
+          },
+        }}
+      />
+    </Stack>
+  );
 };
 
 export default _layout;
