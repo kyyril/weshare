@@ -10,19 +10,20 @@ const CommentItem = ({ item, canDelete, onDeleted = () => {} }) => {
   const createdAt = moment(item.created_at).fromNow();
 
   const handleDelete = () => {
-    Alert.alert("Confirm", "Are you sure want to delete this comment?", [
-      {
-        text: "Cancel",
-        onPress: () => console.log("Canceled"),
-        style: "cancel",
-      },
-      {
-        text: "Delete",
-        onPress: () => onDeleted(item),
-        style: "default",
-      },
-    ]);
+    Alert.alert(
+      "Delete Comment",
+      "Are you sure you want to delete this comment?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          onPress: () => onDeleted(item),
+          style: "destructive",
+        },
+      ]
+    );
   };
+
   return (
     <View style={styles.container}>
       <Avatar
@@ -32,19 +33,21 @@ const CommentItem = ({ item, canDelete, onDeleted = () => {} }) => {
       />
 
       <View style={styles.contentContainer}>
-        <View style={styles.header}>
-          <Text style={styles.username}>{item?.user?.name}</Text>
-          <Text style={styles.time}>{createdAt}</Text>
-        </View>
-
-        {canDelete && (
-          <TouchableOpacity onPress={handleDelete}>
-            <Delete />
-          </TouchableOpacity>
-        )}
         <View style={styles.commentBubble}>
+          <View style={styles.bubbleHeader}>
+            <Text style={styles.username}>{item?.user?.name}</Text>
+            {canDelete && (
+              <TouchableOpacity
+                onPress={handleDelete}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Delete style={styles.deleteIcon} />
+              </TouchableOpacity>
+            )}
+          </View>
           <Text style={styles.commentText}>{item?.text}</Text>
         </View>
+        <Text style={styles.time}>{createdAt}</Text>
       </View>
     </View>
   );
@@ -55,38 +58,42 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: hp(1),
     paddingHorizontal: wp(4),
-    gap: wp(3),
-    alignItems: "flex-start",
+    gap: wp(2),
   },
   contentContainer: {
     flex: 1,
     gap: hp(0.5),
   },
-  header: {
+  commentBubble: {
+    backgroundColor: theme.colors.gray + "15",
+    paddingHorizontal: wp(3),
+    paddingVertical: hp(1),
+    borderRadius: theme.radius.xl,
+    maxWidth: "95%",
+  },
+  bubbleHeader: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 2,
   },
   username: {
-    fontSize: hp(1.8),
+    fontSize: hp(1.7),
     fontWeight: "600",
     color: theme.colors.text,
   },
-  time: {
-    fontSize: hp(1.6),
-    color: theme.colors.textLight,
-  },
-  commentBubble: {
-    backgroundColor: theme.colors.gray + "15",
-    paddingHorizontal: wp(4),
-    paddingVertical: hp(1.2),
-    borderRadius: theme.radius.xl,
-    alignSelf: "flex-start",
-  },
   commentText: {
-    fontSize: hp(1.8),
+    fontSize: hp(1.7),
     color: theme.colors.text,
-    lineHeight: hp(2.4),
+    lineHeight: hp(2.2),
+  },
+  time: {
+    fontSize: hp(1.5),
+    color: theme.colors.textLight,
+    marginLeft: wp(2),
+  },
+  deleteIcon: {
+    color: theme.colors.textLight,
   },
 });
 

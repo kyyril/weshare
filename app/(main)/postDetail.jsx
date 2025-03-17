@@ -37,7 +37,7 @@ const PostDetail = () => {
     console.log("got payload");
     if (payload.new) {
       let newComment = { ...payload.new };
-      newComment.user = user.success ? res.data : {};
+      newComment.user = user || {};
       setPost((prevPost) => {
         return {
           ...prevPost,
