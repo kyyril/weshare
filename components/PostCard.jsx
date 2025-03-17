@@ -16,6 +16,8 @@ import { createPostLike, removePostLike } from "../services/postService";
 import { Alert } from "react-native";
 import ShareIcon from "../assets/icons/Share";
 import Loading from "./Loading";
+import Edit from "../assets/icons/Edit";
+import Delete from "../assets/icons/Delete";
 
 const textStyles = {
   color: theme.colors.dark,
@@ -33,7 +35,15 @@ const tagsStyles = {
   },
 };
 
-const PostCard = ({ item, currentUser, router, showMore = true }) => {
+const PostCard = ({
+  item,
+  currentUser,
+  router,
+  showMore = true,
+  onDelete = () => {},
+  onEdit = () => {},
+  showDelete = true,
+}) => {
   const [likes, setLikes] = useState([]); // Initialize with empty array
   const [loading, setLoading] = useState(false);
 
@@ -117,6 +127,17 @@ const PostCard = ({ item, currentUser, router, showMore = true }) => {
     }
   };
 
+  const handleDeletePost = () => {
+    Alert.alert("Delete Post", "Are you sure you want to delete this Post?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        onPress: () => onDelete(item),
+        style: "destructive",
+      },
+    ]);
+  };
+
   console.log(item.comments[0].count);
   return (
     <View style={[styles.container]}>
@@ -132,6 +153,22 @@ const PostCard = ({ item, currentUser, router, showMore = true }) => {
           <TouchableOpacity onPress={openPostDetail}>
             <ThreeDotsHorizontal />
           </TouchableOpacity>
+        )}
+        {showDelete && currentUser?.id == item?.userId && (
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={{ color: theme.colors.text }}
+              onPress={() => onEdit(item)}
+            >
+              <Edit />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{ color: theme.colors.roseLight }}
+              onPress={handleDeletePost}
+            >
+              <Delete />
+            </TouchableOpacity>
+          </View>
         )}
       </View>
 

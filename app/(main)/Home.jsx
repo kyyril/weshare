@@ -99,7 +99,12 @@ const Home = () => {
           contentContainerStyle={styles.listStyle}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <PostCard item={item} currentUser={user} router={router} />
+            <PostCard
+              item={item}
+              currentUser={user}
+              router={router}
+              showDelete={false}
+            />
           )}
           onEndReached={() => {
             getPosts();

@@ -5,6 +5,7 @@ import {
   createComment,
   fetchPostDetail,
   removeComment,
+  removePost,
 } from "../../services/postService";
 import { hp, wp } from "../../helpers/common";
 import { theme } from "../../constants/theme";
@@ -122,6 +123,18 @@ const PostDetail = () => {
     );
   }
 
+  const onDeletePost = async (item) => {
+    let res = await removePost(post?.id);
+    if (res.success) {
+      router.back();
+    } else {
+      Alert.alert("Post", res.msg);
+    }
+  };
+  const onEditPost = (item) => {
+    console.log("edit post", item);
+  };
+
   const onDeletedComment = async (comment) => {
     let res = await removeComment(comment?.id);
     if (res.success) {
@@ -148,6 +161,9 @@ const PostDetail = () => {
           currentUser={user}
           router={router}
           showMore={false}
+          showDelete={true}
+          onDelete={onDeletePost}
+          onEdit={onEditPost}
         />
 
         {/* comment input */}
