@@ -132,7 +132,8 @@ const PostDetail = () => {
     }
   };
   const onEditPost = (item) => {
-    console.log("edit post", item);
+    router.back();
+    router.push({ pathname: "newPost", params: { ...item } });
   };
 
   const onDeletedComment = async (comment) => {

@@ -7,14 +7,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { hp, wp } from "../../helpers/common";
 import { theme } from "../../constants/theme";
 import Header from "../../components/Header";
 import Avatar from "../../components/Avatar";
 import { useAuth } from "../../context/authContext";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import RichTextEditor from "../../components/RichTextEditor";
 import Button from "../../components/Button";
@@ -27,12 +27,23 @@ import VideoIcon from "../../assets/icons/Video";
 import { createOrUpdatePost } from "../../services/postService";
 
 const NewPost = () => {
+  const post = useLocalSearchParams();
   const { user } = useAuth();
   const bodyRef = useRef("");
   const editorRef = useRef(null);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(file);
+  console.log("post", post);
+  useEffect(() => {
+    if (post && post.id) {
+      bodyRef.current = post.body;
+      setTimeout(() => {
+        editorRef.current?.setContentHTML(post.body);
+      }, 300);
+      setFile(post.file);
+    }
+  }, []);
 
   const onPick = async (isImage) => {
     let mediaConfig = {
@@ -98,6 +109,7 @@ const NewPost = () => {
       body: bodyRef.current,
       userId: user?.id,
     };
+    if (post && post.id) data.id = post.id;
     setLoading(true);
     const res = await createOrUpdatePost(data);
     setLoading(false);
@@ -139,7 +151,7 @@ const NewPost = () => {
             <View style={styles.filePreview}>
               {getFileType(file) == "video" ? (
                 <Video
-                  source={{ uri: getFileUrl(file) }}
+                  source={{ uri: getFileUrl(file) || file }}
                   resizeMode="cover"
                   useNativeControls
                   style={styles.mediaContent}
@@ -147,7 +159,7 @@ const NewPost = () => {
                 />
               ) : (
                 <Image
-                  source={{ uri: getFileUrl(file) }}
+                  source={{ uri: getFileUrl(file) || file }}
                   contentFit="cover"
                   style={styles.mediaContent}
                 />
@@ -194,7 +206,7 @@ const NewPost = () => {
         <Button
           buttonStyle={styles.postButton}
           loading={loading}
-          title="Create"
+          title={post && post.id ? "Update" : "Create"}
           onPress={onSubmit}
         />
       </View>

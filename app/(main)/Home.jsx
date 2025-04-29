@@ -35,8 +35,30 @@ const Home = () => {
     if (payload.eventType == "INSERT" && payload?.new?.id) {
       let newPost = { ...payload.new };
       let res = await getUserData(newPost.userId);
+
+      newPost.postLikes = [];
+      newPost.comments = [{ count: 0 }];
       newPost.user = res.success ? res.data : {};
       setPosts((prevPost) => [newPost, ...prevPost]);
+    }
+    if (payload.eventType == "DELETE" && payload.old.id) {
+      setPosts((prevPost) => {
+        let updatedPosts = prevPost.filter((post) => post.id != payload.old.id);
+        return updatedPosts;
+      });
+    }
+
+    if (payload.eventType == "UPDATE" && payload?.new?.id) {
+      setPosts((prevPost) => {
+        let updatedPosts = prevPost.map((post) => {
+          if (post.id == payload.new.id) {
+            post.body = payload.new.body;
+            post.file = payload.new.file;
+          }
+          return post;
+        });
+        return updatedPosts;
+      });
     }
   };
   useEffect(() => {
