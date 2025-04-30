@@ -18,9 +18,10 @@ import Send from "../../assets/icons/Send";
 import { Alert } from "react-native";
 import CommentItem from "../../components/CommentItem";
 import { supabase } from "../../lib/supabase";
+import { createNotification } from "../../services/notification";
 
 const PostDetail = () => {
-  const { postId } = useLocalSearchParams();
+  const { postId, commentId } = useLocalSearchParams();
   const { user } = useAuth();
   const router = useRouter();
   const [post, setPost] = useState({
@@ -96,6 +97,16 @@ const PostDetail = () => {
     let res = await createComment(data);
     setLoading(false);
     if (res.success) {
+      if (user.id != post.id) {
+        //send notif
+        let notify = {
+          senderId: user.id,
+          receiverId: post.userId,
+          title: "commented on your post",
+          data: JSON.stringify({ postId: post.id, commentId: res?.data?.id }),
+        };
+        createNotification(notify);
+      }
       inputRef.current?.clear();
       commentRef.current = "";
     } else {
@@ -198,6 +209,7 @@ const PostDetail = () => {
               item={comment}
               key={comment?.id?.toString()}
               canDelete={user?.id == comment.userId || user?.id == post.id}
+              highlight={comment.id == commentId}
               onDeleted={() => onDeletedComment(comment)}
             />
           ))}

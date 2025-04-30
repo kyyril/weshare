@@ -30,6 +30,7 @@ const Home = () => {
   const router = useRouter();
   const [posts, setPosts] = useState([]);
   const [hasMore, setHasMore] = useState(true);
+  const [notifCount, setNotifCount] = useState(0);
 
   const handlePostEvent = async (payload) => {
     if (payload.eventType == "INSERT" && payload?.new?.id) {
@@ -61,6 +62,12 @@ const Home = () => {
       });
     }
   };
+
+  const handleNewNotification = async (payload) => {
+    console.log("notif new", payload);
+    if (payload.eventType == "INSERT" && payload.new.id)
+      setNotifCount((prev) => prev + 1);
+  };
   useEffect(() => {
     let postChannel = supabase
       .channel("posts")
@@ -71,10 +78,25 @@ const Home = () => {
       )
       .subscribe();
 
+    let notifChannel = supabase
+      .channel("notification")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notification",
+          filter: `receiverId=eq.${user.id}`,
+        },
+        handleNewNotification
+      )
+      .subscribe();
+
     // getPosts();
 
     return () => {
       supabase.removeChannel(postChannel);
+      supabase.removeChannel(notifChannel);
     };
   }, []);
 
@@ -97,8 +119,18 @@ const Home = () => {
         <View style={styles.header}>
           <Text style={styles.title}>WeShare</Text>
           <View style={styles.icons}>
-            <Pressable onPress={() => router.push("notifications")}>
+            <Pressable
+              onPress={() => {
+                setNotifCount(0);
+                router.push("notifications");
+              }}
+            >
               <Heart color={theme.colors.text} />
+              {notifCount > 0 && (
+                <View style={styles.pill}>
+                  <Text style={styles.pillText}>{notifCount}</Text>
+                </View>
+              )}
             </Pressable>
             <Pressable onPress={() => router.push("newPost")}>
               <Plus color={theme.colors.text} />

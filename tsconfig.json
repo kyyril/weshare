@@ -15,6 +15,7 @@
     "context/authContext.tsx",
     "components/Avatar.jsx",
     "components/BackButton.jsx",
-    "components/Button.jsx"
+    "components/Button.jsx",
+    "components/NotificationItem.jsx"
   ]
 }

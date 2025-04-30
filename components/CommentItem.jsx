@@ -6,7 +6,12 @@ import { hp, wp } from "../helpers/common";
 import { theme } from "../constants/theme";
 import Delete from "../assets/icons/Delete";
 
-const CommentItem = ({ item, canDelete, onDeleted = () => {} }) => {
+const CommentItem = ({
+  item,
+  highlight = false,
+  canDelete,
+  onDeleted = () => {},
+}) => {
   const createdAt = moment(item.created_at).fromNow();
 
   const handleDelete = () => {
@@ -32,7 +37,7 @@ const CommentItem = ({ item, canDelete, onDeleted = () => {} }) => {
         rounded={theme.radius.full}
       />
 
-      <View style={styles.contentContainer}>
+      <View style={[styles.contentContainer, highlight && styles.highlightt]}>
         <View style={styles.commentBubble}>
           <View style={styles.bubbleHeader}>
             <Text style={styles.username}>{item?.user?.name}</Text>
@@ -94,6 +99,15 @@ const styles = StyleSheet.create({
   },
   deleteIcon: {
     color: theme.colors.textLight,
+  },
+  highlightt: {
+    borderWidth: 0.2,
+    backgroundColor: "white",
+    borderColor: theme.colors.dark,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: theme.radius.md,
+    elevation: 5,
   },
 });
 
