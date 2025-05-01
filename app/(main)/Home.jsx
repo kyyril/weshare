@@ -129,7 +129,7 @@ const Home = () => {
         <BlurView intensity={20} style={styles.container} tint="dark">
           {/* header */}
           <View style={styles.header}>
-            <Text style={styles.title}>WeShare</Text>
+            <Text style={styles.title}></Text>
             <View style={styles.icons}>
               <Pressable
                 style={styles.iconButton}
@@ -157,7 +157,7 @@ const Home = () => {
               >
                 <Avatar
                   url={user?.image}
-                  size={hp(3.1)}
+                  size={hp(4.5)}
                   rounded={theme.radius.full}
                   style={{
                     borderWidth: 2,
@@ -214,11 +214,6 @@ const Home = () => {
 export default Home;
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
   gradientOverlay: {
     flex: 1,
   },
@@ -232,15 +227,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginHorizontal: wp(4),
     marginBottom: 15,
-    paddingVertical: 10,
-  },
-  title: {
-    color: theme.colors.textDark,
-    fontSize: hp(3.2),
-    fontWeight: theme.fonts.extraBold,
-    textShadowColor: "rgba(127, 90, 240, 0.8)",
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
+    paddingTop: 10,
   },
   iconButton: {
     padding: 8,

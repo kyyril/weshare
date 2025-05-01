@@ -210,6 +210,7 @@ const PostDetail = () => {
                 onChangeText={(value) => (commentRef.current = value)}
                 placeholder="Type comment..."
                 placeholderTextColor={theme.colors.textLight}
+                style={{ color: "white" }}
                 containerStyle={{
                   flex: 1,
                   height: hp(6.2),
@@ -226,7 +227,7 @@ const PostDetail = () => {
                   style={styles.sendicon}
                   onPress={onNewComment}
                 >
-                  <Send style={{ color: theme.colors.primary }} />
+                  <Send />
                 </TouchableOpacity>
               )}
             </BlurView>
@@ -262,11 +263,6 @@ const PostDetail = () => {
 export default PostDetail;
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
   gradientOverlay: {
     flex: 1,
   },
@@ -302,7 +298,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     height: hp(5.8),
     width: hp(5.8),
-    backgroundColor: "rgba(127, 90, 240, 0.1)",
+    backgroundColor: "rgb(127, 90, 240)",
     shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
@@ -339,8 +335,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.xl,
     backgroundColor: "rgba(30, 30, 30, 0.4)",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.1)",
     marginHorizontal: wp(5),
   },
   noCommentsText: {

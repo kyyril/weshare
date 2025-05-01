@@ -207,10 +207,7 @@ const PostCard = ({
                   <Edit color={theme.colors.text} />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[
-                    styles.actionButton,
-                    { backgroundColor: "rgba(242,95,76,0.3)" },
-                  ]}
+                  style={[styles.actionButton]}
                   onPress={handleDeletePost}
                 >
                   <Delete color={theme.colors.text} />
@@ -308,7 +305,7 @@ export default PostCard;
 const styles = StyleSheet.create({
   outerContainer: {
     marginBottom: 20,
-    borderRadius: theme.radius.xl,
+    borderRadius: theme.radius.sm,
     overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 8 },
@@ -317,13 +314,13 @@ const styles = StyleSheet.create({
     elevation: 16,
   },
   gradientBorder: {
-    borderRadius: theme.radius.xl,
+    borderRadius: theme.radius.sm,
     padding: 1,
     overflow: "hidden",
   },
   container: {
     gap: 12,
-    borderRadius: theme.radius.xl - 1,
+    borderRadius: theme.radius.sm - 1,
     overflow: "hidden",
     padding: 15,
     backgroundColor: theme.colors.glass,
@@ -359,8 +356,8 @@ const styles = StyleSheet.create({
     fontWeight: theme.fonts.medium,
   },
   moreButton: {
-    padding: 8,
-    borderRadius: theme.radius.full,
+    padding: 4,
+    borderRadius: theme.radius.sm,
     backgroundColor: "rgba(77, 77, 77, 0.25)",
   },
   content: {
@@ -372,7 +369,7 @@ const styles = StyleSheet.create({
   postMedia: {
     height: hp(40),
     width: "100%",
-    borderRadius: theme.radius.lg,
+    borderRadius: theme.radius.xs,
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.1)",
@@ -418,7 +415,6 @@ const styles = StyleSheet.create({
   actionButton: {
     padding: 8,
     borderRadius: theme.radius.full,
-    backgroundColor: "rgba(30, 30, 30, 0.7)",
     justifyContent: "center",
     alignItems: "center",
   },

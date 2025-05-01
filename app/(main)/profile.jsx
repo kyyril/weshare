@@ -69,15 +69,15 @@ const Profile = () => {
     <ScreenWrapper bg={theme.colors.dark}>
       <LinearGradient
         colors={[
-          "rgba(127,90,240,0.15)",
-          "rgba(44,182,125,0.15)",
-          "rgba(242,95,76,0.15)",
+          "rgba(127, 90, 240, 0.1)",
+          "rgba(44, 182, 125, 0.1)",
+          "rgba(242, 95, 76, 0.07)",
         ]}
         style={styles.gradientOverlay}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <BlurView intensity={80} style={styles.blurContainer} tint="dark">
+        <BlurView intensity={100} style={styles.blurContainer} tint="dark">
           <FlatList
             data={posts}
             ListHeaderComponent={
@@ -280,8 +280,6 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     padding: 12,
-    borderRadius: theme.radius.sm,
-    backgroundColor: "rgba(255, 77, 109, 0.15)",
   },
   editIcon: {
     position: "absolute",
