@@ -1,10 +1,18 @@
-import { Share, StyleSheet, Text, View } from "react-native";
+import {
+  Share,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import React, { useEffect, useState, useMemo } from "react";
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
 import { theme } from "../constants/theme";
 import { hp, stripHtmlTags, wp } from "../helpers/common";
 import Avatar from "./Avatar";
 import moment from "moment";
-import { TouchableOpacity } from "react-native";
 import ThreeDotsHorizontal from "../assets/icons/ThreeDotsHorizontal";
 import RenderHTML from "react-native-render-html";
 import { Image } from "expo-image";
@@ -13,14 +21,13 @@ import { Video } from "expo-av";
 import Heart from "../assets/icons/Heart";
 import Comment from "../assets/icons/Comment";
 import { createPostLike, removePostLike } from "../services/postService";
-import { Alert } from "react-native";
 import ShareIcon from "../assets/icons/Share";
 import Loading from "./Loading";
 import Edit from "../assets/icons/Edit";
 import Delete from "../assets/icons/Delete";
 
 const textStyles = {
-  color: theme.colors.dark,
+  color: theme.colors.text,
   fontSize: hp(1.75),
 };
 const tagsStyles = {
@@ -28,10 +35,12 @@ const tagsStyles = {
   p: textStyles,
   ol: textStyles,
   h1: {
-    color: theme.colors.dark,
+    color: theme.colors.text,
+    fontWeight: theme.fonts.bold,
   },
   h4: {
-    color: theme.colors.dark,
+    color: theme.colors.text,
+    fontWeight: theme.fonts.semibold,
   },
 };
 
@@ -102,6 +111,7 @@ const PostCard = ({
     //openPostComment
     router.push({ pathname: "postDetail", params: { postId: item?.id } });
   };
+
   const createdAt = moment(item.created_at).format("MMM D");
 
   const onShare = async () => {
@@ -138,109 +148,157 @@ const PostCard = ({
     ]);
   };
 
-  console.log(item.comments[0].count);
+  const getRandomColorIndex = () => {
+    // Generate a pseudo-random number based on post id to maintain consistency
+    const seed = item?.id
+      ? item.id
+          .toString()
+          .split("")
+          .reduce((a, b) => a + b.charCodeAt(0), 0)
+      : 0;
+
+    return seed % 3; // Return 0, 1, or 2
+  };
+
+  const colorAccents = [
+    ["rgba(127,90,240,0.3)", "rgba(127,90,240,0.1)"], // Purple
+    ["rgba(44,182,125,0.3)", "rgba(44,182,125,0.1)"], // Green
+    ["rgba(242,95,76,0.3)", "rgba(242,95,76,0.1)"], // Orange
+    ["rgba(242, 225, 76, 0.3)", "rgba(242, 206, 76, 0.1)"], // yellow
+  ];
+
+  const colorIndex = getRandomColorIndex();
+
   return (
-    <View style={[styles.container]}>
-      <View style={styles.header}>
-        <View style={styles.userInfo}>
-          <Avatar url={item.user.image} radius={theme.radius.xxl * 4} />
-          <View style={{ gap: 2 }}>
-            <Text style={styles.username}>{item?.user?.name}</Text>
-            <Text style={styles.postTime}>{createdAt}</Text>
+    <View style={styles.outerContainer}>
+      <LinearGradient
+        colors={colorAccents[colorIndex]}
+        style={styles.gradientBorder}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <BlurView intensity={20} tint="dark" style={styles.container}>
+          <View style={styles.header}>
+            <View style={styles.userInfo}>
+              <View style={styles.avatarContainer}>
+                <Avatar url={item.user.image} radius={theme.radius.full} />
+              </View>
+              <View style={{ gap: 2 }}>
+                <Text style={styles.username}>{item?.user?.name}</Text>
+                <Text style={styles.postTime}>{createdAt}</Text>
+              </View>
+            </View>
+
+            {showMore && (
+              <TouchableOpacity
+                style={styles.moreButton}
+                onPress={openPostDetail}
+              >
+                <ThreeDotsHorizontal style={{ color: "white" }} />
+              </TouchableOpacity>
+            )}
+
+            {showDelete && currentUser?.id == item?.userId && (
+              <View style={styles.actions}>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => onEdit(item)}
+                >
+                  <Edit color={theme.colors.text} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.actionButton,
+                    { backgroundColor: "rgba(242,95,76,0.3)" },
+                  ]}
+                  onPress={handleDeletePost}
+                >
+                  <Delete color={theme.colors.text} />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
-        </View>
-        {showMore && (
-          <TouchableOpacity onPress={openPostDetail}>
-            <ThreeDotsHorizontal />
-          </TouchableOpacity>
-        )}
-        {showDelete && currentUser?.id == item?.userId && (
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={{ color: theme.colors.text }}
-              onPress={() => onEdit(item)}
-            >
-              <Edit />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{ color: theme.colors.roseLight }}
-              onPress={handleDeletePost}
-            >
-              <Delete />
-            </TouchableOpacity>
+
+          {/* body post */}
+          <View style={styles.content}>
+            <View style={styles.postBody}>
+              {item?.body ? (
+                <RenderHTML
+                  contentWidth={wp(100)}
+                  source={{ html: item?.body || "" }}
+                  defaultTextProps={{
+                    style: { color: theme.colors.text, fontSize: hp(2) },
+                  }}
+                  tagsStyles={tagsStyles}
+                />
+              ) : null}
+            </View>
           </View>
-        )}
-      </View>
 
-      {/* body post */}
-      <View style={styles.content}>
-        <View style={styles.postBody}>
-          {item?.body ? (
-            <RenderHTML
-              contentWidth={wp(100)}
-              source={{ html: item?.body || "" }}
-              defaultTextProps={{ style: { color: theme.colors.text } }}
-              tagsStyles={tagsStyles}
+          {/* post image */}
+          {item?.file && item?.file.includes("postImages") && (
+            <Image
+              source={getSupabaseUrl(item?.file)}
+              style={styles.postMedia}
+              transition={200}
+              contentFit="cover"
+              cachePolicy="memory-disk"
             />
-          ) : null}
-        </View>
-      </View>
-
-      {/* post image */}
-      {item?.file && item?.file.includes("postImages") && (
-        <Image
-          source={getSupabaseUrl(item?.file)}
-          style={styles.postMedia}
-          transition={100}
-          contentFit="cover"
-          cachePolicy="memory-disk"
-        />
-      )}
-      {/* post videos */}
-      {item?.file && item?.file.includes("postVideos") && (
-        <Video
-          source={{ uri: getSupabaseUrl(item?.file) }}
-          style={[styles.postMedia]}
-          useNativeControls
-          resizeMode="cover"
-          isLooping
-          shouldPlay={false}
-          isMuted={true}
-          onError={(error) => console.log("Video Error:", error)}
-        />
-      )}
-
-      {/* liked and comment */}
-      <View style={styles.footer}>
-        <View style={styles.footerButton}>
-          <TouchableOpacity onPress={onLiked}>
-            <Heart
-              fill={isLiked ? theme.colors.rose : "transparent"}
-              style={{
-                color: isLiked ? theme.colors.rose : "black",
-              }}
-            />
-          </TouchableOpacity>
-          <Text style={styles.count}>{likes.length}</Text>
-        </View>
-
-        <View style={styles.footerButton}>
-          <TouchableOpacity onPress={openPostDetail}>
-            <Comment />
-          </TouchableOpacity>
-          <Text style={styles.count}>{item.comments[0].count}</Text>
-        </View>
-
-        <View style={styles.footerButton}>
-          {loading ? (
-            <Loading size="small" />
-          ) : (
-            <TouchableOpacity onPress={onShare}>
-              <ShareIcon />
-            </TouchableOpacity>
           )}
-        </View>
-      </View>
+
+          {/* post videos */}
+          {item?.file && item?.file.includes("postVideos") && (
+            <Video
+              source={{ uri: getSupabaseUrl(item?.file) }}
+              style={[styles.postMedia]}
+              useNativeControls
+              resizeMode="cover"
+              isLooping
+              shouldPlay={false}
+              isMuted={true}
+              onError={(error) => console.log("Video Error:", error)}
+            />
+          )}
+
+          {/* liked and comment */}
+          <View style={styles.footer}>
+            <View style={styles.footerButton}>
+              <TouchableOpacity
+                style={[styles.iconButton, isLiked && styles.activeIconButton]}
+                onPress={onLiked}
+              >
+                <Heart
+                  fill={isLiked ? theme.colors.rose : "transparent"}
+                  style={{
+                    color: isLiked ? theme.colors.text : theme.colors.text,
+                  }}
+                />
+              </TouchableOpacity>
+              <Text style={styles.count}>{likes.length}</Text>
+            </View>
+
+            <View style={styles.footerButton}>
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={openPostDetail}
+              >
+                <Comment color={theme.colors.text} />
+              </TouchableOpacity>
+              <Text style={styles.count}>{item.comments[0].count}</Text>
+            </View>
+
+            <View style={styles.footerButton}>
+              {loading ? (
+                <Loading size="small" color={theme.colors.primary} />
+              ) : (
+                <TouchableOpacity style={styles.iconButton} onPress={onShare}>
+                  <ShareIcon color={theme.colors.text} />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </BlurView>
+      </LinearGradient>
     </View>
   );
 };
@@ -248,25 +306,65 @@ const PostCard = ({
 export default PostCard;
 
 const styles = StyleSheet.create({
-  count: {
-    color: theme.colors.text,
-    fontSize: hp(1.8),
+  outerContainer: {
+    marginBottom: 20,
+    borderRadius: theme.radius.xl,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.44,
+    shadowRadius: 10.32,
+    elevation: 16,
   },
-  actions: {
+  gradientBorder: {
+    borderRadius: theme.radius.xl,
+    padding: 1,
+    overflow: "hidden",
+  },
+  container: {
+    gap: 12,
+    borderRadius: theme.radius.xl - 1,
+    overflow: "hidden",
+    padding: 15,
+    backgroundColor: theme.colors.glass,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  userInfo: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
-  footerButton: {
-    marginLeft: 5,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
+  avatarContainer: {
+    padding: 2,
+    borderRadius: theme.radius.full,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
   },
-  footer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 15,
+  username: {
+    fontSize: hp(1.8),
+    color: theme.colors.textDark,
+    fontWeight: theme.fonts.bold,
+  },
+  postTime: {
+    fontSize: hp(1.4),
+    color: theme.colors.textLight,
+    fontWeight: theme.fonts.medium,
+  },
+  moreButton: {
+    padding: 8,
+    borderRadius: theme.radius.full,
+    backgroundColor: "rgba(77, 77, 77, 0.25)",
+  },
+  content: {
+    gap: 12,
   },
   postBody: {
     marginLeft: 5,
@@ -274,39 +372,54 @@ const styles = StyleSheet.create({
   postMedia: {
     height: hp(40),
     width: "100%",
-    borderRadius: theme.radius.xl,
-    borderCurve: "continuous",
+    borderRadius: theme.radius.lg,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
   },
-  content: {
-    gap: 10,
+  footer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
+    marginTop: 5,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255, 255, 255, 0.1)",
   },
-  postTime: {
-    fontSize: hp(1.4),
-    color: theme.colors.textLight,
-    fontWeight: theme.fonts.medium,
-  },
-  username: {
-    fontSize: hp(1.7),
-    color: theme.colors.textDark,
-    fontWeight: theme.fonts.medium,
-  },
-  userInfo: {
+  footerButton: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  iconButton: {
+    padding: 8,
+    borderRadius: theme.radius.full,
+    backgroundColor: "rgba(30, 30, 30, 0.6)",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  container: {
+  activeIconButton: {
+    backgroundColor: "rgba(255, 77, 109, 0.3)",
+    shadowColor: theme.colors.rose,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.7,
+    shadowRadius: 5,
+  },
+  count: {
+    color: theme.colors.text,
+    fontSize: hp(1.8),
+    fontWeight: theme.fonts.medium,
+  },
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
-    marginBottom: 15,
-    borderRadius: theme.radius.xl,
-    borderCurve: "continuous",
-    padding: 10,
-    paddingVertical: 12,
-    backgroundColor: theme.colors.gray,
-    shadowColor: "#000",
+  },
+  actionButton: {
+    padding: 8,
+    borderRadius: theme.radius.full,
+    backgroundColor: "rgba(30, 30, 30, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

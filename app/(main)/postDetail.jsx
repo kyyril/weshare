@@ -19,6 +19,10 @@ import { Alert } from "react-native";
 import CommentItem from "../../components/CommentItem";
 import { supabase } from "../../lib/supabase";
 import { createNotification } from "../../services/notification";
+import { ImageBackground } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
+import ScreenWrapper from "../../components/ScreenWrapper";
 
 const PostDetail = () => {
   const { postId, commentId } = useLocalSearchParams();
@@ -116,21 +120,26 @@ const PostDetail = () => {
 
   if (startLoading) {
     return (
-      <View style={styles.center}>
-        <Loading />
-      </View>
+      <ScreenWrapper bg={theme.colors.dark}>
+        <View style={styles.center}>
+          <Loading />
+        </View>
+      </ScreenWrapper>
     );
   }
+
   if (!post) {
     return (
-      <View
-        style={[
-          styles.center,
-          { justifyContent: "flex-start", marginTop: 100 },
-        ]}
-      >
-        <Text style={styles.notFound}>Post not found</Text>
-      </View>
+      <ScreenWrapper bg={theme.colors.dark}>
+        <View
+          style={[
+            styles.center,
+            { justifyContent: "flex-start", marginTop: 100 },
+          ]}
+        >
+          <Text style={styles.notFound}>Post not found</Text>
+        </View>
+      </ScreenWrapper>
     );
   }
 
@@ -142,6 +151,7 @@ const PostDetail = () => {
       Alert.alert("Post", res.msg);
     }
   };
+
   const onEditPost = (item) => {
     router.back();
     router.push({ pathname: "newPost", params: { ...item } });
@@ -163,70 +173,107 @@ const PostDetail = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.list}
+    <ScreenWrapper bg={theme.colors.dark}>
+      <LinearGradient
+        colors={[
+          "rgba(127,90,240,0.15)",
+          "rgba(44,182,125,0.15)",
+          "rgba(242,95,76,0.15)",
+        ]}
+        style={styles.gradientOverlay}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
-        <PostCard
-          item={{ ...post, comments: [{ count: post.comments?.length }] }}
-          currentUser={user}
-          router={router}
-          showMore={false}
-          showDelete={true}
-          onDelete={onDeletePost}
-          onEdit={onEditPost}
-        />
-
-        {/* comment input */}
-        <View style={styles.inputContainer}>
-          <Input
-            inputRef={inputRef}
-            onChangeText={(value) => (commentRef.current = value)}
-            placeholder="Type comment..."
-            placeholderTextColor={theme.colors.textLight}
-            containerStyle={{
-              flex: 1,
-              height: hp(6.2),
-              borderRadius: theme.radius.xl,
-            }}
-          />
-          {loading ? (
-            <View style={styles.loading}>
-              <Loading size="small" />
-            </View>
-          ) : (
-            <TouchableOpacity style={styles.sendicon} onPress={onNewComment}>
-              <Send style={{ color: theme.colors.primaryDark }} />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* comment list */}
-        <View style={{ marginVertical: 15, gap: 17 }}>
-          {post?.comments?.map((comment) => (
-            <CommentItem
-              item={comment}
-              key={comment?.id?.toString()}
-              canDelete={user?.id == comment.userId || user?.id == post.id}
-              highlight={comment.id == commentId}
-              onDeleted={() => onDeletedComment(comment)}
+        <BlurView intensity={20} style={styles.container} tint="dark">
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.list}
+          >
+            <PostCard
+              item={{ ...post, comments: [{ count: post.comments?.length }] }}
+              currentUser={user}
+              router={router}
+              showMore={false}
+              showDelete={true}
+              onDelete={onDeletePost}
+              onEdit={onEditPost}
             />
-          ))}
-          {post?.comments?.length == 0 && (
-            <Text style={{ color: theme.colors.text, marginLeft: 5 }}>
-              Be first to comment
-            </Text>
-          )}
-        </View>
-      </ScrollView>
-    </View>
+
+            {/* comment input */}
+            <BlurView
+              intensity={15}
+              style={styles.commentInputContainer}
+              tint="dark"
+            >
+              <Input
+                inputRef={inputRef}
+                onChangeText={(value) => (commentRef.current = value)}
+                placeholder="Type comment..."
+                placeholderTextColor={theme.colors.textLight}
+                containerStyle={{
+                  flex: 1,
+                  height: hp(6.2),
+                  borderRadius: theme.radius.xl,
+                  backgroundColor: theme.colors.darkLight,
+                }}
+              />
+              {loading ? (
+                <View style={styles.loading}>
+                  <Loading size="small" />
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.sendicon}
+                  onPress={onNewComment}
+                >
+                  <Send style={{ color: theme.colors.primary }} />
+                </TouchableOpacity>
+              )}
+            </BlurView>
+
+            {/* comment list */}
+            <View style={styles.commentsList}>
+              {post?.comments?.map((comment) => (
+                <CommentItem
+                  item={comment}
+                  key={comment?.id?.toString()}
+                  canDelete={user?.id == comment.userId || user?.id == post.id}
+                  highlight={comment.id == commentId}
+                  onDeleted={() => onDeletedComment(comment)}
+                />
+              ))}
+              {post?.comments?.length == 0 && (
+                <BlurView
+                  intensity={15}
+                  style={styles.noCommentsContainer}
+                  tint="dark"
+                >
+                  <Text style={styles.noCommentsText}>Be first to comment</Text>
+                </BlurView>
+              )}
+            </View>
+          </ScrollView>
+        </BlurView>
+      </LinearGradient>
+    </ScreenWrapper>
   );
 };
 
 export default PostDetail;
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+  gradientOverlay: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.bg,
+  },
   loading: {
     height: hp(5.8),
     width: hp(5.8),
@@ -238,6 +285,9 @@ const styles = StyleSheet.create({
     fontSize: hp(2.5),
     color: theme.colors.text,
     fontWeight: theme.fonts.medium,
+    textShadowColor: theme.colors.primary,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
   },
   center: {
     flex: 1,
@@ -250,20 +300,52 @@ const styles = StyleSheet.create({
     borderWidth: 0.8,
     borderColor: theme.colors.primary,
     borderRadius: theme.radius.lg,
-    borderCurve: "continuous",
     height: hp(5.8),
     width: hp(5.8),
+    backgroundColor: "rgba(127, 90, 240, 0.1)",
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 5,
   },
   list: {
     paddingHorizontal: wp(4),
+    paddingVertical: wp(4),
+    paddingBottom: hp(10),
   },
-  inputContainer: {
+  commentInputContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
+    padding: wp(3),
+    borderRadius: theme.radius.xl,
+    marginVertical: hp(2),
+    backgroundColor: "rgba(30, 30, 30, 0.4)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
-  container: {
-    flex: 1,
-    paddingVertical: wp(7),
+  commentsList: {
+    marginVertical: 10,
+    gap: 15,
+  },
+  noCommentsContainer: {
+    padding: 15,
+    borderRadius: theme.radius.xl,
+    backgroundColor: "rgba(30, 30, 30, 0.4)",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    marginHorizontal: wp(5),
+  },
+  noCommentsText: {
+    color: theme.colors.text,
+    fontSize: hp(1.8),
+    fontWeight: theme.fonts.medium,
   },
 });

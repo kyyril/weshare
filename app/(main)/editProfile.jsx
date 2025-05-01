@@ -23,6 +23,8 @@ import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { getUserImage, uploadFile } from "../../services/userImage";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 
 const EditProfile = () => {
   const router = useRouter();
@@ -95,70 +97,105 @@ const EditProfile = () => {
   };
 
   return (
-    <ScreenWrapper>
-      <View style={styles.container}>
-        <ScrollView style={{ flex: 1 }}>
-          <Header title={"Edit Profile"} showBackButton />
+    <ScreenWrapper bg={theme.colors.dark}>
+      <LinearGradient
+        colors={[
+          "rgba(127,90,240,0.15)",
+          "rgba(44,182,125,0.15)",
+          "rgba(242,95,76,0.15)",
+        ]}
+        style={styles.gradientOverlay}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <BlurView intensity={100} style={styles.blurContainer} tint="dark">
+          <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+            <View style={styles.container}>
+              <Header
+                title={"Edit Profile"}
+                showBackButton
+                textStyle={styles.headerTitle}
+              />
 
-          <View style={styles.avatarWrapper}>
-            <Image
-              source={getImageSource()}
-              style={styles.avatarImage}
-              contentFit="cover"
-            />
-            <Pressable style={styles.cameraIcon} onPress={onPickImage}>
-              <Camera color={theme.colors.primary} />
-            </Pressable>
-          </View>
+              <View style={styles.avatarWrapper}>
+                <LinearGradient
+                  colors={["rgba(127,90,240,0.5)", "rgba(242,95,76,0.5)"]}
+                  style={styles.avatarGlow}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Image
+                    source={getImageSource()}
+                    style={styles.avatarImage}
+                    contentFit="cover"
+                  />
+                </LinearGradient>
+                <Pressable style={styles.cameraIcon} onPress={onPickImage}>
+                  <Camera color={theme.colors.primary} />
+                </Pressable>
+              </View>
 
-          <View style={styles.form}>
-            <Text style={{ fontSize: hp(1.5), color: theme.colors.text }}>
-              Fill in the field you want to replace
-            </Text>
-            <Input
-              icon={<User />}
-              size={26}
-              strokeWidth={1.6}
-              placeholder="Enter your name"
-              value={user.name}
-              onChangeText={(value) => {
-                setUser({ ...user, name: value });
-              }}
-            />
-            <Input
-              icon={<Location />}
-              size={26}
-              strokeWidth={1.6}
-              placeholder="Enter your location"
-              value={user.address}
-              onChangeText={(value) => {
-                setUser({ ...user, address: value });
-              }}
-            />
-            <Input
-              icon={<Call />}
-              size={26}
-              strokeWidth={1.6}
-              placeholder="Enter your phone number"
-              value={user.phoneNumber}
-              onChangeText={(value) => {
-                setUser({ ...user, phoneNumber: value });
-              }}
-            />
-            <Input
-              multiline={true}
-              containerStyle={styles.bio}
-              placeholder="Enter your bio"
-              value={user.bio}
-              onChangeText={(value) => {
-                setUser({ ...user, bio: value });
-              }}
-            />
+              <BlurView intensity={25} tint="dark" style={styles.formContainer}>
+                <Text style={styles.formLabel}>
+                  Complete your profile information
+                </Text>
 
-            <Button title="Update" loading={loading} onPress={onSubmit} />
-          </View>
-        </ScrollView>
-      </View>
+                <Input
+                  style={{ color: "white" }}
+                  icon={<User color={theme.colors.primary} />}
+                  size={26}
+                  strokeWidth={1.6}
+                  placeholder="Enter your name"
+                  value={user.name}
+                  onChangeText={(value) => {
+                    setUser({ ...user, name: value });
+                  }}
+                />
+                <Input
+                  style={{ color: "white" }}
+                  icon={<Location color={theme.colors.primary} />}
+                  size={26}
+                  strokeWidth={1.6}
+                  placeholder="Enter your location"
+                  value={user.address}
+                  onChangeText={(value) => {
+                    setUser({ ...user, address: value });
+                  }}
+                />
+                <Input
+                  style={{ color: "white" }}
+                  icon={<Call color={theme.colors.primary} />}
+                  size={26}
+                  strokeWidth={1.6}
+                  placeholder="Enter your phone number"
+                  value={user.phoneNumber}
+                  onChangeText={(value) => {
+                    setUser({ ...user, phoneNumber: value });
+                  }}
+                />
+                <Input
+                  style={{ color: "white" }}
+                  multiline={true}
+                  containerStyle={styles.bio}
+                  placeholder="Enter your bio"
+                  value={user.bio}
+                  onChangeText={(value) => {
+                    setUser({ ...user, bio: value });
+                  }}
+                />
+
+                <Button
+                  title="Update Profile"
+                  loading={loading}
+                  onPress={onSubmit}
+                  buttonStyle={styles.updateButton}
+                  hasShadow={true}
+                />
+              </BlurView>
+            </View>
+          </ScrollView>
+        </BlurView>
+      </LinearGradient>
     </ScreenWrapper>
   );
 };
@@ -166,47 +203,23 @@ const EditProfile = () => {
 export default EditProfile;
 
 const styles = StyleSheet.create({
-  bio: {
-    flexDirection: "row",
-    height: hp(15),
-    alignItems: "flex-start",
-    paddingVertical: 15,
+  gradientOverlay: {
+    flex: 1,
+    width: wp(100),
   },
-  input: {
-    flexDirection: "row",
-    borderWidth: 0.4,
-    borderColor: theme.colors.text,
-    borderRadius: theme.radius.sm,
-    borderCurve: theme.radius.sm,
-    padding: 17,
-    paddingHorizontal: 20,
-    gap: 15,
-  },
-  form: {
-    gap: 10,
-    marginTop: 20,
-  },
-  avatar: {
-    borderCurve: "continuous",
-    borderWidth: 1,
-    borderColor: theme.colors.darkLight,
+  blurContainer: {
+    flex: 1,
+    backgroundColor: "rgba(13, 13, 13, 0.5)",
   },
   container: {
     flex: 1,
     paddingHorizontal: wp(4),
+    paddingBottom: 30,
   },
-  cameraIcon: {
-    position: "absolute",
-    right: -10,
-    bottom: -10,
-    padding: 10,
-    borderRadius: theme.radius.xl,
-    backgroundColor: "white",
-    shadowColor: theme.colors.textLight,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+  headerTitle: {
+    color: theme.colors.text,
+    fontSize: hp(2.6),
+    fontWeight: theme.fonts.bold,
   },
   avatarWrapper: {
     marginVertical: hp(3),
@@ -214,11 +227,72 @@ const styles = StyleSheet.create({
     position: "relative",
     alignSelf: "center",
   },
+  avatarGlow: {
+    padding: 4,
+    borderRadius: theme.radius.xxl * 4,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 15,
+  },
   avatarImage: {
-    width: hp(16),
-    height: hp(16),
+    width: hp(18),
+    height: hp(18),
     borderRadius: theme.radius.xxl * 4,
     borderWidth: 2,
-    borderColor: theme.colors.primary + "20",
+    borderColor: theme.colors.primary + "40",
+  },
+  cameraIcon: {
+    position: "absolute",
+    right: -10,
+    bottom: -10,
+    padding: 12,
+    borderRadius: theme.radius.xl,
+    backgroundColor: theme.colors.glass,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  formContainer: {
+    borderRadius: theme.radius.lg,
+    overflow: "hidden",
+    backgroundColor: theme.colors.glass,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+    gap: 6,
+  },
+  formLabel: {
+    fontSize: hp(1.8),
+    color: theme.colors.text,
+    fontWeight: theme.fonts.medium,
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  bio: {
+    flexDirection: "row",
+    height: hp(15),
+    alignItems: "flex-start",
+    paddingVertical: 15,
+    backgroundColor: "rgba(0,0,0,0.2)",
+    borderWidth: 0.4,
+    borderColor: theme.colors.primary + "50",
+    borderRadius: theme.radius.xxl,
+    borderCurve: "continuous",
+    marginVertical: 5,
+  },
+  updateButton: {
+    backgroundColor: theme.colors.primary,
+    marginTop: 15,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 15,
+    elevation: 8,
   },
 });

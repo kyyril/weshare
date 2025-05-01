@@ -23,6 +23,8 @@ import Call from "../../assets/icons/Call";
 import { fetchPosts } from "../../services/postService";
 import PostCard from "../../components/PostCard";
 import Loading from "../../components/Loading";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 
 var limit = 0;
 const Profile = () => {
@@ -34,7 +36,6 @@ const Profile = () => {
   const getPosts = async () => {
     if (!hasMore) return null;
     limit = limit + 10;
-    //getpost
     console.log("fetch limit:", limit);
     const res = await fetchPosts(limit, user.id);
     if (res.success) {
@@ -44,7 +45,6 @@ const Profile = () => {
   };
 
   const handleLogout = async () => {
-    //show confirm modal
     Alert.alert("Logout", "Are you sure you want to logout?", [
       {
         text: "No",
@@ -64,73 +64,95 @@ const Profile = () => {
       },
     ]);
   };
+
   return (
-    <ScreenWrapper bg={"white"}>
-      <FlatList
-        data={posts}
-        ListHeaderComponent={
-          <UserHeader user={user} router={router} handleLogout={handleLogout} />
-        }
-        ListHeaderComponentStyle={{ marginBottom: 30 }}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listStyle}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <PostCard
-            item={item}
-            currentUser={user}
-            router={router}
-            showDelete={false}
+    <ScreenWrapper bg={theme.colors.dark}>
+      <LinearGradient
+        colors={[
+          "rgba(127,90,240,0.15)",
+          "rgba(44,182,125,0.15)",
+          "rgba(242,95,76,0.15)",
+        ]}
+        style={styles.gradientOverlay}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <BlurView intensity={80} style={styles.blurContainer} tint="dark">
+          <FlatList
+            data={posts}
+            ListHeaderComponent={
+              <UserHeader
+                user={user}
+                router={router}
+                handleLogout={handleLogout}
+              />
+            }
+            ListHeaderComponentStyle={{ marginBottom: 20 }}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listStyle}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <BlurView intensity={15} tint="dark">
+                <PostCard
+                  item={item}
+                  currentUser={user}
+                  router={router}
+                  showDelete={false}
+                />
+              </BlurView>
+            )}
+            onEndReached={() => {
+              getPosts();
+              console.log("end");
+            }}
+            onEndReachedThreshold={0}
+            ListFooterComponent={
+              hasMore ? (
+                <View style={{ marginVertical: posts.length == 0 ? 200 : 30 }}>
+                  <Loading />
+                </View>
+              ) : (
+                <BlurView
+                  intensity={15}
+                  tint="dark"
+                  style={styles.noMoreContainer}
+                >
+                  <Text style={styles.noPost}>No more posts</Text>
+                </BlurView>
+              )
+            }
           />
-        )}
-        onEndReached={() => {
-          getPosts();
-          console.log("end");
-        }}
-        onEndReachedThreshold={0}
-        ListFooterComponent={
-          hasMore ? (
-            <View style={{ marginVertical: posts.length == 0 ? 200 : 30 }}>
-              <Loading />
-            </View>
-          ) : (
-            <View style={{ marginVertical: 30 }}>
-              <Text style={styles.noPost}>no more posts</Text>
-            </View>
-          )
-        }
-      />
+        </BlurView>
+      </LinearGradient>
     </ScreenWrapper>
   );
 };
 
 const UserHeader = ({ user, router, handleLogout }) => {
   return (
-    <View
-      style={{ flex: 1, backgroundColor: "white", paddingHorizontal: wp(4) }}
-    >
+    <View style={styles.headerContainer}>
       {/* header */}
-      <View>
-        <Header title={"Profile"} showBackButton={true} />
+      <View style={styles.topHeader}>
+        <Header showBackButton={true} textStyle={styles.headerTitle} />
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Logout style={{ color: theme.colors.rose }} />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.container}>
+      <BlurView intensity={100} tint="dark" style={styles.profileCard}>
         {/* avatar */}
-        <View style={[styles.contentContainer, { gap: 10 }]}>
+        <View style={[styles.contentContainer, { gap: 15 }]}>
           <View style={styles.avatarWrapper}>
             <Avatar
               url={user?.image}
-              size={hp(12)}
+              size={hp(14)}
               rounded={theme.radius.xxl * 4}
             />
             <Pressable
               style={styles.editIcon}
               onPress={() => router.push("editProfile")}
             >
-              <Edit />
+              <Edit style={{ color: theme.colors.primary }} />
             </Pressable>
           </View>
 
@@ -140,29 +162,31 @@ const UserHeader = ({ user, router, handleLogout }) => {
               {(user && user.name) || "username"}
             </Text>
             <Text style={styles.infoText}>
-              {" "}
-              {(user && user.address) || "yunani"}
+              {(user && user.address) || "location"}
             </Text>
           </View>
-          <View style={{ gap: 10 }}>
+
+          <View style={styles.infoContainer}>
             <View style={styles.info}>
-              <Mail style={{ color: theme.colors.textLight }} />
+              <Mail style={{ color: theme.colors.primary }} />
               <Text style={styles.infoText}>
-                {(user && user.email) || "lorem@gmail.com"}
+                {(user && user.email) || "email@example.com"}
               </Text>
             </View>
             <View style={styles.info}>
-              <Call style={{ color: theme.colors.textLight }} />
+              <Call style={{ color: theme.colors.primary }} />
               <Text style={styles.infoText}>
                 {(user && user.phoneNumber) || "0808080808"}
               </Text>
             </View>
-            <Text style={styles.infoText}>
-              {(user && user.bio) || "biolorem ipsum dolor sit amet"}
-            </Text>
+            <View style={styles.bioContainer}>
+              <Text style={styles.bioText}>
+                {(user && user.bio) || "Bio information goes here"}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
+      </BlurView>
     </View>
   );
 };
@@ -170,72 +194,134 @@ const UserHeader = ({ user, router, handleLogout }) => {
 export default Profile;
 
 const styles = StyleSheet.create({
+  gradientOverlay: {
+    flex: 1,
+    width: wp(100),
+  },
+  blurContainer: {
+    flex: 1,
+    backgroundColor: "rgba(13, 13, 13, 0.5)",
+  },
+  headerContainer: {
+    paddingHorizontal: wp(4),
+    paddingBottom: 10,
+  },
+  topHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: 10,
+    paddingBottom: 15,
+  },
+  headerTitle: {
+    color: theme.colors.text,
+    fontSize: hp(2.6),
+    fontWeight: theme.fonts.bold,
+  },
+  profileCard: {
+    borderRadius: theme.radius.lg,
+    marginTop: 10,
+    padding: wp(4),
+    overflow: "hidden",
+    backgroundColor: theme.colors.glass,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+  },
   contentContainer: {
     alignItems: "center",
-    gap: 15,
-  },
-  noPost: {
-    fontSize: hp(2),
-    textAlign: "center",
-    color: theme.colors.text,
+    paddingVertical: 15,
   },
   avatarWrapper: {
     position: "relative",
     alignItems: "center",
+    marginBottom: 5,
   },
-  listStyle: {
-    paddingHorizontal: wp(4),
-    paddingBottom: 30,
+  userName: {
+    fontSize: hp(3.2),
+    fontWeight: theme.fonts.bold,
+    color: theme.colors.text,
+    textShadowColor: "rgba(127, 90, 240, 0.3)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
-  logoutButton: {
-    position: "absolute",
-    right: 0,
-    padding: 5,
-    borderRadius: theme.radius.sm,
-    backgroundColor: "#fee2e2",
-  },
-  infoText: {
-    fontSize: hp(1.6),
-    color: theme.colors.textLight,
-    fontWeight: "500",
+  infoContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 10,
+    gap: 12,
   },
   info: {
     flexDirection: "row",
-    justifyContent: "center",
+    alignItems: "center",
     gap: 10,
   },
-  userName: {
-    fontSize: hp(3),
-    fontWeight: "500",
-    color: theme.colors.textDark,
+  infoText: {
+    fontSize: hp(1.7),
+    color: theme.colors.textLight,
+    fontWeight: theme.fonts.medium,
+  },
+  bioContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 5,
+    padding: 10,
+    backgroundColor: "rgba(0,0,0,0.2)",
+    borderRadius: theme.radius.md,
+  },
+  bioText: {
+    fontSize: hp(1.8),
+    color: theme.colors.text,
+    fontWeight: theme.fonts.medium,
+    textAlign: "center",
+    fontStyle: "italic",
+  },
+  logoutButton: {
+    padding: 12,
+    borderRadius: theme.radius.sm,
+    backgroundColor: "rgba(255, 77, 109, 0.15)",
   },
   editIcon: {
     position: "absolute",
     right: -12,
     bottom: -4,
-    padding: 7,
+    padding: 8,
     borderRadius: theme.radius.md,
-    backgroundColor: "white",
-    shadowColor: theme.colors.textLight,
+    backgroundColor: theme.colors.glass,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    elevation: 7,
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  avatarContainer: {
-    height: hp(12),
-    width: wp(12),
-    alignSelf: "center",
+  listStyle: {
+    paddingHorizontal: wp(4),
+    paddingBottom: 30,
+    gap: 15,
   },
-  headerShape: {
-    width: wp(100),
-    height: hp(20),
+  postCard: {
+    borderRadius: theme.radius.lg,
+    overflow: "hidden",
+    backgroundColor: theme.colors.glass,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  headerContainer: {
-    marginHorizontal: wp(4),
-    marginBottom: 20,
+  noMoreContainer: {
+    marginTop: 20,
+    padding: 15,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.glass,
+    alignItems: "center",
   },
-  container: {
-    flex: 1,
+  noPost: {
+    fontSize: hp(1.8),
+    textAlign: "center",
+    color: theme.colors.textLight,
+    fontWeight: theme.fonts.medium,
   },
 });
