@@ -87,8 +87,10 @@ const EditProfile = () => {
   };
 
   const getImageSource = () => {
+    const defaultUserImage = "https://placehold.co/180";
+
     if (!user.image) {
-      return require("../../assets/images/defaultUser.png");
+      return defaultUserImage;
     }
     if (typeof user.image === "object") {
       return { uri: user.image.uri };

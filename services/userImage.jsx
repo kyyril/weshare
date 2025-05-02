@@ -6,7 +6,7 @@ export const getUserImage = (imagePath) => {
   if (imagePath) {
     return getSupabaseUrl(imagePath);
   }
-  return require("../assets/images/defaultUser.png");
+  return "https://placehold.co/180";
 };
 
 export const getSupabaseUrl = (filePath) => {

@@ -3,19 +3,23 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "app/index.tsx",
-    "context/authContext.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    ".expo/types/**/*.js",
+    "expo-env.d.js",
+    "app/index.jsx",
+    "context/authContext.jsx",
     "components/Avatar.jsx",
     "components/BackButton.jsx",
     "components/Button.jsx",
-    "components/NotificationItem.jsx"
+    "components/NotificationItem.jsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
   ]
 }
