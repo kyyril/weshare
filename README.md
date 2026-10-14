@@ -2,6 +2,13 @@
 
 A cross-platform mobile social media application built with React Native and Expo, featuring authentication, rich text editing, post sharing, and media support.
 
+## App Preview
+
+<p align="center">
+  <img src="https://res.cloudinary.com/da5ggxk01/image/upload/v1746208810/43b2e80d-b6b5-456a-a87d-9e811d8b8232.png" width="45%" alt="WeShare Preview 1" />
+  <img src="https://res.cloudinary.com/da5ggxk01/image/upload/v1746208916/d4f6b935-08f1-402b-a313-8bede3d49965.png" width="45%" alt="WeShare Preview 2" />
+</p>
+
 ## Tech Stack
 
 * **Framework:** [React Native](https://reactnative.dev/), [Expo](https://expo.dev/)
